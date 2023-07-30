@@ -1,6 +1,7 @@
 ![LinkedIn GPT - Automated job applications tailored to you.](img/github-banner.jpg)
 
 # LinkedIn GPT
+
 Automatically apply to _LinkedIn Easy Apply_ jobs. This bot answers the application questions as well!
 
 This is a fork of a fork of the original _LinkedIn Easy Apply Bot_, but it is a very special fork of a fork, this one relies on LLMs to answer the questions.
@@ -10,9 +11,10 @@ This is a fork of a fork of the original _LinkedIn Easy Apply Bot_, but it is a 
 This bot is written in Python using Selenium and OpenAI.
 
 ## Fork Notes
+
 The original bot implementation, couldn't handle open questions, just used keywords and predefined answers. Such couldn't complete a lot of the applications, as any open question or weird selector would make the bot unable to answer. Now that we have LLM, this is an easy problem to solve, just ask the bot to answer the question, and it will do it.
 
-Another great benefit, is that you can provide way more information to the bot, so it can address truthfully the job requirements, and the questions, just as you would do. 
+Another great benefit, is that you can provide way more information to the bot, so it can address truthfully the job requirements, and the questions, just as you would do.
 
 I did try to tidy the code a bit, but I didn't want to spend too much time on it, as I just wanted to get it working, so there is still a lot of work to do there.
 
@@ -21,20 +23,32 @@ Thank you for everyone that contributed to the original bot, and all the forks, 
 _by Jorge Frías_
 
 ### Future updates
+
 - I will keep updating this fork as I use it for my own "educational research".
 - I will add features as I find fun applications, or I require them for my "educational research".
 
 ## Setup
 
 ### OpenAI API Key
+
 First you need to provide your Open AI API key using environment variable `OPEN_AI_API_KEY`.
 
-> [You can set up the environment variable in your venv](https://stackoverflow.com/a/20918496/8150874)
+```bash
+#copy example env file to env
+cp .env.example .env
+```
+
+```bash
+#.env
+OPEN_AI_API_KEY="PASTE OPEN API KEY"
+```
 
 I recommend to set a [Rate Limit](https://platform.openai.com/account/rate-limits) on your OpenAI account if you plan to leave the bot running for a long time, as it can get expensive quickly. I tried to use the cheapest models possible, but still requires `GPT-3.5-Turbo` to work.
 
 ### Your information
+
 Your information is provided with a directory containing the following files:
+
 - `config.yaml`. This file contains the information used to search on LinkedIn and fill in your personal information. Most of this is self-explanatory but if you need explanations please see the end of this `README`.
 - `plain_text_resume.md`. Will be used to answer the questions, it's provided in MarkDown format.
 - `plain_text_cover_letter.md`. Will be used when the form ask for a cover letter. When the form ask to write a cover letter (not upload it), the bot will adjust the cover letter to the job description.
@@ -46,44 +60,58 @@ Your information is provided with a directory containing the following files:
 
   The `# Job Title Filters` section is used to filter the job title, and the `# Job Description Filters` section is used to filter the job description (once the job passes the job title filtering). The information on these sections is used on different steps of the process, you can have different rules on each section, or the same rules on both sections.
   
-  Use natural language to explain what you are interested in, and what you are not. The LLM will try to understand what you mean, and will decide to apply or not to the job. 
+  Use natural language to explain what you are interested in, and what you are not. The LLM will try to understand what you mean, and will decide to apply or not to the job.
 
-> An `output` folder will be created, where you will find all generated answers to the questions.
+> An `config/output` folder will be created, where you will find all generated answers to the questions.
 
 The folder approach enables you to have multiple configurations (based on locations, roles...), and switch between them easily.
 
-**You will find templates for all this files in the `templates` folder.**
+**You will find templates for all this files in the `Templates` folder.**
 
 ### Install required libraries
+>
 > You should use a `virtual environment` for this, but it is not required.
+
 ```bash
 pip3 install -r requirements.txt
 ```
 
 ## Execute
+
 To run the bot, run the following in the command line, providing the path to your personal information directory as only argument.
+
 ```bash
-python3 main.py path/to/your/personal/iformation/directory
+#copy template example data
+cp Templates data
+
+#Fill it with your own data
+
+python3 main.py $(pwd)/config
 ```
 
-## Config.yaml Explanations
+## data/Config.yaml Explanations
+
 Just fill in your email and password for linkedin.
+
 ```yaml
 email: email@domain.com
 password: yourpassword
 ```
 
 This prevents your computer from going to sleep so the bot can keep running when you are not using it. Set this to True if you want this disabled.
+
 ```yaml
 disableAntiLock: False
 ```
 
 Set this to True if you want to look for remote jobs only.
+
 ```yaml
 remote: False
 ```
 
 This is for what level of jobs you want the search to contain. You must choose at least one.
+
 ```yaml
 experienceLevel:
  internship: False
@@ -95,6 +123,7 @@ experienceLevel:
 ```
 
 This is for what type of job you are looking for. You must choose at least one.
+
 ```yaml
 jobTypes:
  full-time: True
@@ -107,6 +136,7 @@ jobTypes:
 ```
 
 How far back you want to search. You must choose only one.
+
 ```yaml
 date:
  all time: True
@@ -116,6 +146,7 @@ date:
  ```
 
 A list of positions you want to apply for. You must include at least one.
+
 ```yaml
 positions:
  #- First position
@@ -125,6 +156,7 @@ positions:
  ```
 
 A list of locations you are applying to. You must include at least one.
+
 ```yaml
 locations:
  #- First location
@@ -135,11 +167,13 @@ locations:
  ```
 
 How far out of the location you want your search to go. You can only input 0, 5, 10, 25, 50, 100 miles.
+
 ```yaml
 distance: 25
  ```
 
 A list of companies to not apply to.
+
 ```yaml
 companyBlacklist:
  #- company
@@ -147,6 +181,7 @@ companyBlacklist:
  ```
 
 A list of words that will be used to skip over jobs with any of these words in there.
+
 ```yaml
 titleBlacklist:
  #- word1
@@ -156,7 +191,8 @@ titleBlacklist:
 Input your personal info. Include the state/province in the city name to not get the wrong city when choosing from a dropdown.
 The phone country code needs to be exact for the one that is on linkedin.
 The website is interchangeable for github/portfolio/website.
-> This information should also be provided on `personal_data.md`.
+> This information should also be provided on `Templates/personal_data.md`.
+
 ```yaml
 # ------------ Additional parameters: personal info ---------------
 personalInfo:
@@ -173,6 +209,7 @@ personalInfo:
 ```
 
 # Known issues
+
 - The bot not always replaces correctly the placeholders on the cover letter.
 - If any field has problems with the answer, e.g. expected a number and the bot generated a text, the application will not proceed.
 - Usually the first screen asking for contact information also ask for a `summary`, gpt doesn't fill this screen, so the application will not proceed.
