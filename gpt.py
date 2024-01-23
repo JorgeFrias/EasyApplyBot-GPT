@@ -18,13 +18,16 @@ from Levenshtein import distance
 from langchain.schema import BaseMessage
 import inspect
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class LLMLogger:
     """
     Logs the requests and responses to a file, to be able to analyze the performance of the model.
     """
-    def __init__(self, llm: LLM):
-        self.llm = llm
+    def __init__(self, llm: OpenAI):
+        self.llm = OpenAI
 
     @staticmethod
     def log_request(model: str, prompt: str, reply: str):
@@ -47,9 +50,9 @@ class LLMLogger:
         f.close()
 
 
-class LoggerLLMModel(LLM):
-    import langchain
-    llm: langchain.llms.openai.OpenAI
+class LoggerLLMModel(OpenAI):
+    import langchain_community.llms
+    llm: OpenAI
 
     @property
     def _llm_type(self) -> str:
@@ -113,13 +116,13 @@ class GPTAnswerer:
         '''
 
         # Wrapping the models on a logger to log the requests and responses
-        self.llm_cheap = LoggerChatModel(llm=ChatOpenAI(model_name="gpt-3.5-turbo-0613", openai_api_key=GPTAnswerer.openai_api_key(), temperature=0.5))
+        self.llm_cheap = LoggerChatModel(llm=ChatOpenAI(model_name="gpt-3.5-turbo-0613", openai_api_key=GPTAnswerer.openai_api_key(), temperature=0.8))
         """
         The cheapest model that can handle most tasks.
         
         Currently using the GPT-3.5 Turbo model.
         """
-        self.llm_expensive = LoggerLLMModel(llm=OpenAI(model_name="text-davinci-003", openai_api_key=GPTAnswerer.openai_api_key(), temperature=0.5))
+        self.llm_expensive = LoggerLLMModel(llm=OpenAI(model_name="text-davinci-003", openai_api_key=GPTAnswerer.openai_api_key(), temperature=0.8))
         """
         The most expensive model, used for the tasks GPT-3.5 Turbo can't handle.
         
@@ -139,13 +142,13 @@ class GPTAnswerer:
     def openai_api_key():
         """
         Returns the OpenAI API key.
-        environment variable used: OPEN_AI_API_KEY
+        environment variable used: OPENAI_API_KEY
         Returns: The OpenAI API key.
         """
-        key = os.getenv('OPEN_AI_API_KEY')
+        key = os.getenv('OPENAI_API_KEY')
 
         if key is None:
-            raise Exception("OpenAI API key not found. Please set the OPEN_AOI_API_KEY environment variable.")
+            raise Exception("OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.")
 
         return key
 
@@ -257,9 +260,10 @@ class GPTAnswerer:
         - The cover letter is preserved almost untouched, it's very slightly modified to better match the job description keywords.
         - All personal paragraphs aren't modified at all.
         - Only paragraphs about why the person is a good fit for the job are modified.
-        - All placeholders [[placeholder]] are replaced with the appropriate information from the job description. 
-        - When there is no information to fill in a placeholder, it's removed and the text is adapted accordingly.
-        - The structure and meaning of the cover letter is keep untouched, only the keywords and placeholders are modified.    
+        - All placeholders [[placeholder]] and [[company]] are replaced with the appropriate information from the job description - job title & company name. 
+        - When there is no information to fill in [[placeholder]] or [[company]], the placeholders are removed and the whole body of texts is adapted accordingly.
+        - There should be no mentions of [[placeholder]] and [[company]] in the final cover letter.
+        - The structure and meaning of the cover letter is kept untouched, only the keywords and placeholders are modified.    
         
         ## Job Description:
         ```
@@ -381,8 +385,8 @@ class GPTAnswerer:
         
         ## Rules
         - Answer the question directly, if possible.
-        - If seems likely that you have the experience based on the resume, even if is not explicit on the resume, answer as if you have the experience.
-        - If you cannot answer the question, answer things like "I have no experience with that, but I learn fast, very fast", "not yet, but I will learn".
+        - If it seems likely that you have the experience based on the resume, even if not explicitly stated on the resume, answer as if you have the experience.
+        - If you cannot answer the question, provide answers like "I have no experience with that, but I learn fast, very fast", "not yet, but I will learn".
         - The answer must not be larger than a tweet (140 characters).
         - Answer questions directly. eg. "Full Name" -> "John Oliver", "Experience with python" -> "10 years"
 
@@ -416,12 +420,12 @@ class GPTAnswerer:
 
         return output
 
-    def answer_question_numeric(self, question: str, default_experience: int = 0) -> int:
+    def answer_question_numeric(self, question: str, default_experience: int = 4) -> int:
         template = """The following is a resume and an answered question about the resume, the answer is an integer number.
         
         ## Rules
         - The answer must be an integer number.
-        - The answer must only contain digits.
+        - The answer must only contain digits, starting from 3.
         - If you cannot answer the question, answer {default_experience}.
         
         ## Example
@@ -666,9 +670,9 @@ class GPTAnswerer:
         The objective is to fix the text of a form input on a web page.
 
         ## Rules
-        - Use the error to fix te original text.
+        - Use the error to fix the original text.
         - The error "Please enter a valid answer" usually means the text is too large, shorten the reply to less than a tweet.
-        - For errors like "Enter a whole number between 0 and 30", just need a number.
+        - For errors like "Enter a whole number between 3 and 30", just need a number.
         
         -----
         
