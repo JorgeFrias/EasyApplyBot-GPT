@@ -6,3 +6,4 @@ validate_email
 langchain
 langchain-community
 Levenshtein~=0.21.0
+openai

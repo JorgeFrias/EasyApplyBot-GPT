@@ -4,8 +4,9 @@ import textwrap
 from datetime import datetime
 from typing import Optional, List, Mapping, Any
 from utils import Markdown
-from langchain import PromptTemplate, OpenAI
-from langchain.chat_models import ChatOpenAI
+from langchain.prompts import PromptTemplate
+from langchain_community.llms import OpenAI
+from langchain_community.chat_models import ChatOpenAI
 from langchain.callbacks.manager import CallbackManagerForLLMRun
 from langchain.chains.router import MultiPromptChain
 from langchain.chains import ConversationChain
@@ -13,7 +14,6 @@ from langchain.chains.llm import LLMChain
 from langchain.chains.router.llm_router import LLMRouterChain, RouterOutputParser
 from langchain.chains.router.multi_prompt_prompt import MULTI_PROMPT_ROUTER_TEMPLATE
 from langchain.chat_models.base import BaseChatModel, SimpleChatModel
-from langchain.llms.base import LLM
 from Levenshtein import distance
 from langchain.schema import BaseMessage
 import inspect

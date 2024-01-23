@@ -10,7 +10,6 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from pathlib import Path
 import utils
 
-
 def init_browser():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=utils.chromeBrowserOptions())
     return driver
