@@ -5,6 +5,32 @@ from itertools import takewhile
 import math, time, config
 from typing import List
 
+from selenium import webdriver
+
+def chromeBrowserOptions():
+    options = webdriver.ChromeOptions()
+    options.add_argument('--no-sandbox')
+    options.add_argument("--ignore-certificate-errors")
+    options.add_argument("--disable-extensions")
+    options.add_argument('--disable-gpu')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--remote-debugging-port=9222')
+    if(config.headless):
+        options.add_argument("--headless")
+    options.add_argument("--start-maximized")
+    options.add_argument("--disable-blink-features")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_experimental_option('useAutomationExtension', False)
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    if(len(config.chromeProfilePath)>0):
+        initialPath = config.chromeProfilePath[0:config.chromeProfilePath.rfind("/")]
+        profileDir = config.chromeProfilePath[config.chromeProfilePath.rfind("/")+1:]
+        options.add_argument('--user-data-dir=' +initialPath)
+        options.add_argument("--profile-directory=" +profileDir)
+    else:
+        options.add_argument("--incognito")
+    return options
+
 class Markdown:
     @staticmethod
     def extract_content_from_markdown(markdown_text: str, title: str) -> str:
@@ -47,3 +73,6 @@ class Markdown:
             markdown_text = file.read()
 
         return Markdown.extract_content_from_markdown(markdown_text, title)
+
+def prYellow(prt):
+    print(f"\033[93m{prt}\033[00m")
