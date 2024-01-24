@@ -16,7 +16,6 @@ import os
 import utils
 
 
-
 class EnvironmentKeys:
     """
     Reads the environment variables and stores them.
@@ -124,7 +123,7 @@ class LinkedinEasyApply:
         if not self.isLoggedIn():
             time.sleep(10)
             self.driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
-            utils.prYellow("🔄 Trying to log in to your Linkedin...")
+            utils.prYellow("🔄 Trying to log in Linkedin...")
             try:    
                 self.driver.find_element("id","username").send_keys(self.email)
                 time.sleep(10)
@@ -133,7 +132,7 @@ class LinkedinEasyApply:
                 self.driver.find_element("xpath",'//button[@type="submit"]').click()
                 time.sleep(5)
             except:
-                utils.prRed("❌ Couldn't log in Linkedin by using Chrome. Please check your Linkedin credentials in the config file.")
+                utils.prRed("❌ Couldn't log in Linkedin by using Chrome. Please check your Linkedin credentials on config file.")
 
             # self.saveCookies()
         # start application
@@ -202,7 +201,7 @@ class LinkedinEasyApply:
                 time.sleep(time_left)
                 minimum_page_time = time.time() + minimum_time
             if page_sleep % 5 == 0:
-                sleep_time = random.randint(500, 900)
+                sleep_time = random.randint(50, 90)
                 print("Sleeping for " + str(sleep_time / 60) + " minutes.")
                 time.sleep(sleep_time)
                 page_sleep += 1
@@ -747,7 +746,6 @@ class LinkedinEasyApply:
     def unfollow(self):
         try:
             follow_checkbox = self.browser.find_element(By.XPATH, "//label[contains(.,\'to stay up to date with their page.\')]").click()
-            follow_checkbox.click()
         except Exception as e:
             print(f"Failed to unfollow company! {e}")
 
