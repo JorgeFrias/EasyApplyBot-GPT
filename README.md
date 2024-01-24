@@ -1,5 +1,8 @@
 ![LinkedIn GPT - Automated job applications tailored to you.](img/github-banner.jpg)
 
+## Disclaimer
+I picked this up and working to fix it because I need a job :pray:
+
 # LinkedIn GPT
 Automatically apply to _LinkedIn Easy Apply_ jobs. This bot answers the application questions as well!
 

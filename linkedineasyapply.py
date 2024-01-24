@@ -1,7 +1,11 @@
 import time, random, csv, pyautogui, pdb, traceback, sys
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.keys import Keys
+from selenium import webdriver
 from selenium.webdriver.common.by import By
+
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.remote.webelement import WebElement
 from datetime import date
@@ -9,6 +13,8 @@ from itertools import product
 from gpt import GPTAnswerer
 from pathlib import Path
 import os
+import utils
+
 
 
 class EnvironmentKeys:
@@ -133,6 +139,15 @@ class LinkedinEasyApply:
         if '/checkpoint/challenge/' in current_url or 'security check' in page_source:
             input("Please complete the security check and press enter in this console when it is done.")
             time.sleep(random.uniform(5.5, 10.5))
+
+    def isLoggedIn(self):
+        self.driver.get('https://www.linkedin.com/feed')
+        try:
+            self.driver.find_element(By.XPATH,'//*[@id="ember14"]')
+            return True
+        except:
+            pass
+        return False 
 
     def start_applying(self):
         searches = list(product(self.positions, self.locations))
