@@ -35,10 +35,10 @@ _by Jorge Frías_
 ## Setup
 
 ### OpenAI API Key
-First you need to provide your Open AI API key using environment variable `OPEN_AI_API_KEY`.
+First you need to provide your Open AI API key using environment variable `OPENAI_API_KEY`.
 
-Create a `.env` file and set a variable as below:
-`OPEN_AI_API_KEY = sk-xxxxx_key_from_openai_xxxxx`
+Create a `.env` file and set a variable like this:
+`OPENAI_API_KEY = sk-xxxxx_key_from_openai_xxxxx`
 
 > [You can set up the environment variable in your venv](https://stackoverflow.com/a/20918496/8150874)
 
