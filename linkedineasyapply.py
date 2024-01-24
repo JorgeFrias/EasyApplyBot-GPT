@@ -121,16 +121,23 @@ class LinkedinEasyApply:
         # - Build the GPT answerer using the plain text data
         self.gpt_answerer = GPTAnswerer(plain_text_resume, plain_text_personal_data, plain_text_cover_letter, job_filters)
 
-    def login(self):
-        try:
-            self.browser.get("https://www.linkedin.com/login")
-            time.sleep(random.uniform(5, 10))
-            self.browser.find_element(By.ID, "username").send_keys(self.email)
-            self.browser.find_element(By.ID, "password").send_keys(self.password)
-            self.browser.find_element(By.CSS_SELECTOR, ".btn__primary--large").click()
-            time.sleep(random.uniform(5, 10))
-        except TimeoutException:
-            raise Exception("Could not login!")
+        if not self.isLoggedIn():
+            time.sleep(10)
+            self.driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
+            utils.prYellow("🔄 Trying to log in to your Linkedin...")
+            try:    
+                self.driver.find_element("id","username").send_keys(self.email)
+                time.sleep(10)
+                self.driver.find_element("id","password").send_keys(self.password)
+                time.sleep(5)
+                self.driver.find_element("xpath",'//button[@type="submit"]').click()
+                time.sleep(5)
+            except:
+                utils.prRed("❌ Couldn't log in Linkedin by using Chrome. Please check your Linkedin credentials in the config file.")
+
+            # self.saveCookies()
+        # start application
+        self.start_applying()
 
     def security_check(self):
         current_url = self.browser.current_url
