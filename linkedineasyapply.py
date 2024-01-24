@@ -72,6 +72,10 @@ class EnvironmentKeys:
 class LinkedinEasyApply:
     def __init__(self, parameters, driver):
         self.browser = driver
+        utils.prYellow("🌐 Bot will run in Chrome browser and log in Linkedin for you.")
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=utils.chromeBrowserOptions())
+        self.driver.get('https://www.linkedin.com')
+        time.sleep(10)
         self.email = parameters['email']
         self.password = parameters['password']
         self.disable_lock = parameters['disableAntiLock']
@@ -133,8 +137,6 @@ class LinkedinEasyApply:
                 time.sleep(5)
             except:
                 utils.prRed("❌ Couldn't log in Linkedin by using Chrome. Please check your Linkedin credentials on config file.")
-
-            # self.saveCookies()
         # start application
         self.start_applying()
 
