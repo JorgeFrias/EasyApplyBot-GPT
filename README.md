@@ -3,6 +3,11 @@
 ## Disclaimer
 I picked this up and working to fix it because I need a job :pray:
 
+Okay. Job done! See my notes on how to make this fork work below:
+
+### :pray:
+Please :pray: :pray: read the [Setup](#Setup) section of this readMe before usage. T for Thanks
+
 # LinkedIn GPT
 Automatically apply to _LinkedIn Easy Apply_ jobs. This bot answers the application questions as well!
 
@@ -32,11 +37,19 @@ _by Jorge Frías_
 ### OpenAI API Key
 First you need to provide your Open AI API key using environment variable `OPEN_AI_API_KEY`.
 
+Create a `.env` file and set a variable as below:
+`OPEN_AI_API_KEY = sk-xxxxx_key_from_openai_xxxxx`
+
 > [You can set up the environment variable in your venv](https://stackoverflow.com/a/20918496/8150874)
 
 I recommend to set a [Rate Limit](https://platform.openai.com/account/rate-limits) on your OpenAI account if you plan to leave the bot running for a long time, as it can get expensive quickly. I tried to use the cheapest models possible, but still requires `GPT-3.5-Turbo` to work.
 
 ### Your information
+Before you read the below:
+- Add your resume in PDF to the [`data_folder`](./data_folder) folder. File name should end with `Resume`, yes, you can include spaces.
+- Add your cover letter in PDF to the `./data_folder` folder. File name should end with `cover_letter`, yes, it can be any name that includes the words `cover letter`.
+- The above info already exists, but uneasy to locate. Buried in the middle of nowhere.
+
 Your information is provided with a directory containing the following files:
 - `config.yaml`. This file contains the information used to search on LinkedIn and fill in your personal information. Most of this is self-explanatory but if you need explanations please see the end of this `README`.
 - `plain_text_resume.md`. Will be used to answer the questions, it's provided in MarkDown format.
@@ -175,7 +188,8 @@ personalInfo:
  Website: https://www.my-website.com # github/website is interchangeable here
 ```
 
-# Known issues
+# Known issues with the parent of this fork
 - The bot not always replaces correctly the placeholders on the cover letter.
-- If any field has problems with the answer, e.g. expected a number and the bot generated a text, the application will not proceed.
-- Usually the first screen asking for contact information also ask for a `summary`, gpt doesn't fill this screen, so the application will not proceed.
+- The bot sets 0 to all fields with int values. Terrible UX for fields about years of experience.This fork has handled this but set a fallback value of 4.
+- If any field has problems with the answer, e.g. expected a number and the bot generated a text, the application will not proceed. [This fork now handles that case and lets the application proceed].
+- Usually the first screen asking for contact information also ask for a `summary`, gpt doesn't fill this screen, so the application will not proceed. [This fork also now fills the summary but takes a while since it will communicate with OpenAI].
