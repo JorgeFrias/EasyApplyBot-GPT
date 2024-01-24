@@ -1,7 +1,11 @@
 import time, random, csv, pyautogui, pdb, traceback, sys
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.keys import Keys
+from selenium import webdriver
 from selenium.webdriver.common.by import By
+
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.remote.webelement import WebElement
 from datetime import date
@@ -9,6 +13,7 @@ from itertools import product
 from gpt import GPTAnswerer
 from pathlib import Path
 import os
+import utils
 
 
 class EnvironmentKeys:
@@ -67,6 +72,10 @@ class EnvironmentKeys:
 class LinkedinEasyApply:
     def __init__(self, parameters, driver):
         self.browser = driver
+        utils.prYellow("🌐 Bot will run in Chrome browser and log in Linkedin for you.")
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=utils.chromeBrowserOptions())
+        self.driver.get('https://www.linkedin.com')
+        time.sleep(10)
         self.email = parameters['email']
         self.password = parameters['password']
         self.disable_lock = parameters['disableAntiLock']
@@ -115,16 +124,21 @@ class LinkedinEasyApply:
         # - Build the GPT answerer using the plain text data
         self.gpt_answerer = GPTAnswerer(plain_text_resume, plain_text_personal_data, plain_text_cover_letter, job_filters)
 
-    def login(self):
-        try:
-            self.browser.get("https://www.linkedin.com/login")
-            time.sleep(random.uniform(5, 10))
-            self.browser.find_element(By.ID, "username").send_keys(self.email)
-            self.browser.find_element(By.ID, "password").send_keys(self.password)
-            self.browser.find_element(By.CSS_SELECTOR, ".btn__primary--large").click()
-            time.sleep(random.uniform(5, 10))
-        except TimeoutException:
-            raise Exception("Could not login!")
+        if not self.isLoggedIn():
+            time.sleep(10)
+            self.driver.get("https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
+            utils.prYellow("🔄 Trying to log in Linkedin...")
+            try:    
+                self.driver.find_element("id","username").send_keys(self.email)
+                time.sleep(10)
+                self.driver.find_element("id","password").send_keys(self.password)
+                time.sleep(5)
+                self.driver.find_element("xpath",'//button[@type="submit"]').click()
+                time.sleep(5)
+            except:
+                utils.prRed("❌ Couldn't log in Linkedin by using Chrome. Please check your Linkedin credentials on config file.")
+        # start application
+        self.start_applying()
 
     def security_check(self):
         current_url = self.browser.current_url
@@ -133,6 +147,15 @@ class LinkedinEasyApply:
         if '/checkpoint/challenge/' in current_url or 'security check' in page_source:
             input("Please complete the security check and press enter in this console when it is done.")
             time.sleep(random.uniform(5.5, 10.5))
+
+    def isLoggedIn(self):
+        self.driver.get('https://www.linkedin.com/feed')
+        try:
+            self.driver.find_element(By.XPATH,'//*[@id="ember14"]')
+            return True
+        except:
+            pass
+        return False 
 
     def start_applying(self):
         searches = list(product(self.positions, self.locations))
@@ -180,7 +203,7 @@ class LinkedinEasyApply:
                 time.sleep(time_left)
                 minimum_page_time = time.time() + minimum_time
             if page_sleep % 5 == 0:
-                sleep_time = random.randint(500, 900)
+                sleep_time = random.randint(50, 90)
                 print("Sleeping for " + str(sleep_time / 60) + " minutes.")
                 time.sleep(sleep_time)
                 page_sleep += 1
@@ -725,7 +748,6 @@ class LinkedinEasyApply:
     def unfollow(self):
         try:
             follow_checkbox = self.browser.find_element(By.XPATH, "//label[contains(.,\'to stay up to date with their page.\')]").click()
-            follow_checkbox.click()
         except Exception as e:
             print(f"Failed to unfollow company! {e}")
 

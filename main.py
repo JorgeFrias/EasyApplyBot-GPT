@@ -3,18 +3,15 @@ import argparse
 from linkedineasyapply import LinkedinEasyApply
 from validate_email import validate_email
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.options import Options
-from pathlib import Path
+from selenium.webdriver.common.by import By
 
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from pathlib import Path
+import utils
 
 def init_browser():
-    browser_options = Options()
-    options = ['--disable-blink-features', '--no-sandbox', '--disable-extensions',
-               '--ignore-certificate-errors', '--disable-blink-features=AutomationControlled','--disable-gpu','--remote-debugging-port=9222']
-    for option in options:
-        browser_options.add_argument(option)
-    driver = webdriver.Chrome(options=browser_options)
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=utils.chromeBrowserOptions())
     return driver
 
 
