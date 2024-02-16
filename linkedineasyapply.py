@@ -146,7 +146,7 @@ class LinkedinEasyApply:
             location_url = "&location=" + location
             job_page_number = -1
 
-            print("Starting the search for " + position + " in " + location + ".")
+            print(f"Starting the search for {position} in {location}.")
 
             try:
                 while True:

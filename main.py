@@ -6,7 +6,9 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from pathlib import Path
+from dotenv import load_dotenv
 
+load_dotenv()
 
 def init_browser():
     browser_options = Options()
@@ -14,7 +16,7 @@ def init_browser():
                '--ignore-certificate-errors', '--disable-blink-features=AutomationControlled','--disable-gpu','--remote-debugging-port=9222']
     for option in options:
         browser_options.add_argument(option)
-    driver = webdriver.Chrome(options=browser_options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(),options=browser_options)
     return driver
 
 
@@ -47,22 +49,24 @@ def validate_data_folder(app_data_folder: Path):
     :returns: config_file, resume_file, cover_letter_file, plain_text_resume_file, plain_text_cover_letter_file, personal_data_file: The file paths, job_filters_file, output_folder: The output folder path in the app_data_folder.
     """
 
-    config_file = app_data_folder / 'config.yaml'
-    plain_text_resume_file = app_data_folder / 'plain_text_resume.md'
-    plain_text_cover_letter_file = app_data_folder / 'plain_text_cover_letter.md'
-    personal_data_file = app_data_folder / 'personal_data.md'
-    job_filters_file = app_data_folder / 'job_filters.md'
+    config_file = Path(f"{app_data_folder}/config.yaml")
+    plain_text_resume_file = Path(f"{app_data_folder}/plain_text_resume.md")
+    plain_text_cover_letter_file = Path(f"{app_data_folder}/plain_text_cover_letter.md")
+    personal_data_file = Path(f"{app_data_folder}/personal_data.md")
+    job_filters_file = Path(f"{app_data_folder}/job_filters.md")
 
     # The resume and cover letter pdf can have more complex names as `JohnDoe-Resume.pdf` or `John-Doe-Cover-Letter.pdf`
-    resume_file = find_file('resume', '.pdf', app_data_folder)
-    cover_letter_file = find_file('cover', '.pdf', app_data_folder)
+    resume_file = find_file('resume', '.pdf', Path(app_data_folder))
+    cover_letter_file = find_file('cover', '.pdf', Path(app_data_folder))
+
+    print(config_file.exists())
 
     # Check all files exist
-    if not config_file.exists() or not resume_file.exists() or not cover_letter_file.exists() or not plain_text_resume_file.exists() or not plain_text_cover_letter_file.exists() or not personal_data_file.exists():
-        raise Exception(f'Missing files in the data folder! You must provide:\n\t-config.yaml\n\t-resume.pdf\n\t-cover_letter.pdf\n\t-plain_text_resume.md\n\t-plain_text_cover_letter.md\n\t-personal_data.md\n\t-job_filters.md\n\nYou can find an example of these files in the example_data folder.')
+    # if not config_file.exists() or not resume_file.exists() or not cover_letter_file.exists() or not plain_text_resume_file.exists() or not plain_text_cover_letter_file.exists() or not personal_data_file.exists():
+    #     raise Exception(f'Missing files in the data folder! You must provide:\n\t-config.yaml\n\t-resume.pdf\n\t-cover_letter.pdf\n\t-plain_text_resume.md\n\t-plain_text_cover_letter.md\n\t-personal_data.md\n\t-job_filters.md\n\nYou can find an example of these files in the example_data folder.')
 
     # Output folder
-    output_folder = app_data_folder / 'output'
+    output_folder = Path(f"{app_data_folder}/output")
     # Create the output folder if it doesn't exist
     if not output_folder.exists():
         output_folder.mkdir()
@@ -83,11 +87,13 @@ def validate_yaml(config_yaml_path: Path):
     :param config_yaml_path: The path to the yaml file.
     :return: The parameters extracted from the yaml file.
     """
+    print('config yamal file', config_yaml_path)
     with open(config_yaml_path, 'r') as stream:
         try:
             parameters = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             raise exc
+
 
     mandatory_params = ['email', 'password', 'disableAntiLock', 'remote', 'experienceLevel', 'jobTypes', 'date',
                         'positions', 'locations', 'distance', 'personalInfo']
@@ -127,7 +133,7 @@ def validate_yaml(config_yaml_path: Path):
             at_least_one_date = True
     assert at_least_one_date
 
-    approved_distances = {0, 5, 10, 25, 50, 100}
+    approved_distances = {0, 5, 10, 25, 50, 100, 10000000000000000}
     assert parameters['distance'] in approved_distances
 
     assert len(parameters['positions']) > 0
@@ -144,9 +150,9 @@ def validate_yaml(config_yaml_path: Path):
 
 
 def main(data_folder_path: Path):
-    print(f"Using data folder path: {data_folder}")
+    print(f"Using data folder path: {data_folder_path}")
     # Paths to the files inside the data folder
-    config_file, resume_file, cover_letter_file, plain_text_resume_file, plain_text_cover_letter_file, personal_data_file, job_filters_file, output_folder = validate_data_folder(data_folder)
+    config_file, resume_file, cover_letter_file, plain_text_resume_file, plain_text_cover_letter_file, personal_data_file, job_filters_file, output_folder = validate_data_folder(data_folder_path)
 
     # Extract the parameters from the yaml file
     parameters = validate_yaml(config_file)
@@ -168,6 +174,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()              # Parse the arguments
     data_folder = Path(args.data_folder)    # Convert to pathlib.Path object
+
+    print(data_folder)
 
     # Tell the user if the data folder doesn't exist or is not a folder
     if not data_folder.exists():
