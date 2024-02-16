@@ -16,7 +16,7 @@ def init_browser():
                '--ignore-certificate-errors', '--disable-blink-features=AutomationControlled','--disable-gpu','--remote-debugging-port=9222']
     for option in options:
         browser_options.add_argument(option)
-    driver = webdriver.Chrome(options=browser_options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(),options=browser_options)
     return driver
 
 

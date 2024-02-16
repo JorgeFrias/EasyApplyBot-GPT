@@ -49,7 +49,7 @@ class LLMLogger:
 
 class LoggerLLMModel(LLM):
     import langchain
-    llm: langchain.llms.openai.OpenAI
+    llm: langchain.llms.OpenAI
 
     @property
     def _llm_type(self) -> str:
@@ -69,8 +69,8 @@ class LoggerLLMModel(LLM):
 
 
 class LoggerChatModel(SimpleChatModel):
-    import langchain
-    llm: langchain.chat_models.openai.ChatOpenAI
+    import langchain_openai
+    llm: langchain_openai.ChatOpenAI
 
     @property
     def _llm_type(self) -> str:
